@@ -61,6 +61,31 @@
       text-decoration: none; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
     }
     .nav-cta:hover { background: #d4593d; transform: translateY(-1px); }
+    .nav-ham {
+      display: none; background: none; border: 1px solid var(--border);
+      border-radius: 8px; color: #fff; font-size: 20px;
+      padding: 6px 10px; cursor: pointer; flex-shrink: 0; line-height: 1;
+    }
+    .nav-dropdown {
+      display: none; position: fixed; top: 61px; right: 0; left: 0; z-index: 99;
+      background: rgba(5,14,31,0.98); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); padding: 12px 0;
+      flex-direction: column;
+    }
+    .nav-dropdown.open { display: flex; }
+    .nav-dropdown a {
+      padding: 14px 24px; font-size: 15px; font-weight: 600;
+      color: rgba(255,255,255,.75); border-bottom: 1px solid var(--border);
+      text-decoration: none; display: block;
+    }
+    .nav-dropdown a:last-child { border-bottom: none; }
+    .nav-dropdown a:hover { color: #fff; background: rgba(255,255,255,.05); }
+    .nav-dropdown .dd-cta {
+      margin: 12px 16px 4px; padding: 14px;
+      background: var(--coral); color: #fff; text-align: center;
+      border-radius: 12px; font-weight: 700; border-bottom: none;
+    }
+    .nav-dropdown .dd-cta:hover { background: #d4593d; }
 
     /* ── HERO ── */
     .hero {
@@ -481,7 +506,8 @@
     @media (max-width: 600px) {
       nav { padding: 10px 16px; }
       .nav-logo-text { display: none; }
-      .nav-cta { padding: 9px 16px; font-size: 13px; }
+      .nav-cta { display: none; }
+      .nav-ham { display: block; }
       section { padding: 60px 16px; }
       .hero { padding: 110px 16px 50px; }
       .hero h1 { font-size: 28px; }
@@ -519,7 +545,19 @@
       </div>
     </div>
     <button onclick="openModal()" class="nav-cta">Get Started</button>
+    <button class="nav-ham" id="nav-ham" onclick="toggleNav()" aria-label="Menu">&#9776;</button>
   </nav>
+
+  <!-- DROPDOWN -->
+  <div class="nav-dropdown" id="nav-dropdown">
+    <a href="#how-it-works" onclick="closeNav()">How It Works</a>
+    <a href="#features" onclick="closeNav()">Features</a>
+    <a href="#how-it-connects" onclick="closeNav()">How It Connects</a>
+    <a href="#compare" onclick="closeNav()">Compare</a>
+    <a href="#industries" onclick="closeNav()">Industries</a>
+    <a href="#get-started" onclick="closeNav()">Contact</a>
+    <a href="javascript:void(0)" class="dd-cta" onclick="closeNav();openModal()">Get Your Page Built &rarr;</a>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -1154,6 +1192,17 @@
   <button class="fab" onclick="openModal()">Get Started &rarr;</button>
 
   <script>
+    function toggleNav() {
+      var dd = document.getElementById('nav-dropdown');
+      var ham = document.getElementById('nav-ham');
+      var open = dd.classList.toggle('open');
+      ham.innerHTML = open ? '&#x2715;' : '&#9776;';
+    }
+    function closeNav() {
+      document.getElementById('nav-dropdown').classList.remove('open');
+      document.getElementById('nav-ham').innerHTML = '&#9776;';
+    }
+
     function openModal() {
       document.getElementById('modal').classList.add('open');
       document.body.style.overflow = 'hidden';
