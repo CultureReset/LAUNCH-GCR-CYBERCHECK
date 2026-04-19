@@ -31,21 +31,34 @@
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 16px 40px;
-      background: rgba(5,14,31,0.92);
-      backdrop-filter: blur(16px);
+      padding: 12px 32px;
+      background: rgba(5,14,31,0.95);
+      backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
     }
     .nav-logo {
-      font-size: 20px; font-weight: 800; color: var(--text);
       display: flex; align-items: center; gap: 10px;
+      font-size: 16px; font-weight: 800; color: var(--text);
+      flex-shrink: 0;
     }
-    .nav-logo span { color: var(--accent); }
+    .nav-logo-imgs { display: flex; align-items: center; gap: 6px; }
+    .nav-logo img {
+      height: 36px; width: 36px; border-radius: 50%;
+      object-fit: cover; mix-blend-mode: screen; flex-shrink: 0;
+    }
+    .nav-logo-divider {
+      width: 1px; height: 24px; background: rgba(255,255,255,.15); flex-shrink: 0;
+    }
+    .nav-logo-text { display: flex; flex-direction: column; line-height: 1.2; }
+    .nav-logo-text .line1 { font-size: 13px; font-weight: 800; color: var(--accent); letter-spacing: -.2px; }
+    .nav-logo-text .line2 { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: .2px; }
     .nav-cta {
-      padding: 10px 24px; background: var(--coral); color: #fff;
+      padding: 10px 22px; background: var(--coral); color: #fff;
       border-radius: 50px; font-weight: 700; font-size: 14px;
-      text-decoration: none; transition: all 0.2s;
+      border: none; cursor: pointer;
+      text-decoration: none; transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
     }
     .nav-cta:hover { background: #d4593d; transform: translateY(-1px); }
 
@@ -466,18 +479,27 @@
       .industry-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 600px) {
-      nav { padding: 14px 20px; }
-      section { padding: 70px 20px; }
-      .hero { padding: 120px 20px 60px; }
-      .hero h1 { font-size: 30px; }
-      .hero p { font-size: 16px; }
-      .section-title { font-size: 28px; }
+      nav { padding: 10px 16px; }
+      .nav-logo-text { display: none; }
+      .nav-cta { padding: 9px 16px; font-size: 13px; }
+      section { padding: 60px 16px; }
+      .hero { padding: 110px 16px 50px; }
+      .hero h1 { font-size: 28px; }
+      .hero p { font-size: 15px; margin-bottom: 24px; }
+      .hero-badge { font-size: 11px; }
+      .section-title { font-size: 26px; }
+      .section-sub { font-size: 15px; margin-bottom: 32px; }
       .features-grid { grid-template-columns: 1fr; }
       .pain-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .industry-grid { grid-template-columns: repeat(2, 1fr); }
-      .offer-title { font-size: 34px; }
+      .offer-title { font-size: 30px; }
       .flow-row { gap: 8px; }
+      .btn-primary, .btn-secondary { padding: 13px 22px; font-size: 15px; }
+      .cta-section { padding: 60px 16px; }
+      .cta-inner h2 { font-size: 26px; }
+      .fab { bottom: 16px; right: 12px; padding: 12px 18px; font-size: 14px; }
+      .modal-box { padding: 28px 20px; }
     }
   </style>
 </head>
@@ -486,11 +508,17 @@
   <!-- NAV -->
   <nav>
     <div class="nav-logo">
-      <img src="gcr-logo.jpg" alt="Gulf Coast Radar" style="height:38px;width:38px;border-radius:50%;object-fit:cover;mix-blend-mode:screen;">
-      <img src="cybercheck-logo.jpg" alt="CyberCheck" style="height:38px;width:38px;border-radius:50%;object-fit:cover;mix-blend-mode:screen;">
-      Gulf <span>Coast Radar</span> &nbsp;+&nbsp; Cyber<span>Check</span>
+      <div class="nav-logo-imgs">
+        <img src="gcr-logo.jpg" alt="Gulf Coast Radar">
+        <div class="nav-logo-divider"></div>
+        <img src="cybercheck-logo.jpg" alt="CyberCheck">
+      </div>
+      <div class="nav-logo-text">
+        <span class="line1">Gulf Coast Radar</span>
+        <span class="line2">Powered by CyberCheck</span>
+      </div>
     </div>
-    <button onclick="openModal()" class="nav-cta">Get Your Page Built</button>
+    <button onclick="openModal()" class="nav-cta">Get Started</button>
   </nav>
 
   <!-- HERO -->
