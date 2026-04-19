@@ -1184,6 +1184,60 @@
       });
     }
     document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+    /* ── ANALYTICS ─────────────────────────────────────────────── */
+    var _SUPABASE_URL  = 'https://mhafixflyffflwjhcgfn.supabase.co';
+    var _SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oYWZpeGZseWZmZmx3amhjZ2ZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MTA4MzUsImV4cCI6MjA4NzM4NjgzNX0.3KW-rGnLhJQ1u3IsSeoGFfgQpcoJNdBGFOGnhc88tHw';
+
+    function trackEvent(eventName, props) {
+      var payload = Object.assign({
+        event:      eventName,
+        page:       window.location.pathname,
+        source:     document.referrer || 'direct',
+        user_agent: navigator.userAgent,
+        ts:         new Date().toISOString(),
+        site:       'launch-gcr-cybercheck'
+      }, props || {});
+      fetch(_SUPABASE_URL + '/rest/v1/page_events', {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        _SUPABASE_ANON,
+          'Authorization': 'Bearer ' + _SUPABASE_ANON,
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      }).catch(function(){});
+    }
+
+    // Page view on load
+    window.addEventListener('load', function() { trackEvent('page_view'); });
+
+    // Track every CTA click
+    document.querySelectorAll('.btn-primary, .btn-secondary, .nav-cta, .fab').forEach(function(el) {
+      el.addEventListener('click', function() {
+        trackEvent('cta_click', { label: el.textContent.trim().substring(0,60) });
+      });
+    });
+
+    // Track modal open
+    var _origOpen = openModal;
+    openModal = function() {
+      trackEvent('modal_open');
+      _origOpen();
+    };
+
+    // Track form submission attempts
+    var _origModal = modalSubmit;
+    modalSubmit = function() {
+      trackEvent('form_submit', { form: 'modal' });
+      _origModal();
+    };
+    var _origInline = inlineSubmit;
+    inlineSubmit = function() {
+      trackEvent('form_submit', { form: 'inline' });
+      _origInline();
+    };
   </script>
 </body>
 </html>
