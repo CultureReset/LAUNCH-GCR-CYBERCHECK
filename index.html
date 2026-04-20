@@ -484,6 +484,11 @@
     .consent-cb{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--coral);cursor:pointer}
     .consent-text{font-size:.83rem;color:var(--muted);line-height:1.55}
     .consent-text a{color:var(--accent);text-decoration:underline}
+    .interests-box{background:rgba(244,162,97,.06);border:1px solid rgba(244,162,97,.2);border-radius:14px;padding:14px 16px}
+    .interests-label{font-size:.8rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+    .interests-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .int-item{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;color:var(--muted)}
+    .int-item input{width:16px;height:16px;accent-color:var(--gold);flex-shrink:0;cursor:pointer}
     .m-submit{width:100%;padding:16px;border-radius:12px;background:var(--coral);color:#fff;font-weight:700;font-size:1rem;border:none;cursor:pointer;transition:.2s all;font-family:'Inter',sans-serif;box-shadow:0 8px 32px rgba(231,111,81,.4)}
     .m-submit:hover:not(:disabled){background:#d4593d;transform:translateY(-2px)} .m-submit:disabled{opacity:.55;cursor:not-allowed}
     .m-success{display:none;text-align:center;padding:20px 0}
@@ -1089,7 +1094,7 @@
           <input type="tel" class="form-input" placeholder="Phone Number" required>
           <input type="email" class="form-input" placeholder="Email Address">
         </div>
-        <select class="form-select form-input">
+        <select id="inline-type" class="form-select form-input">
           <option value="">Business Type</option>
           <option>Charter Fishing</option>
           <option>Boat Rentals</option>
@@ -1105,6 +1110,16 @@
           <option>Shop / Boutique</option>
           <option>Other</option>
         </select>
+        <div class="interests-box">
+          <div class="interests-label">I'm interested in (check all that apply)</div>
+          <div class="interests-checks">
+            <label class="int-item"><input type="checkbox" id="il-int-page"> Full Business Page</label>
+            <label class="int-item"><input type="checkbox" id="il-int-booking"> Booking Platform</label>
+            <label class="int-item"><input type="checkbox" id="il-int-sdata"> Structured Data</label>
+            <label class="int-item"><input type="checkbox" id="il-int-auto"> Automations</label>
+            <label class="int-item"><input type="checkbox" id="il-int-qr"> QR Menu</label>
+          </div>
+        </div>
         <div style="background:rgba(0,180,216,.06);border:1px solid rgba(0,180,216,.18);border-radius:14px;padding:16px;text-align:left;">
           <label style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;">
             <input type="checkbox" id="inline-consent" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--coral);">
@@ -1166,6 +1181,16 @@
             <option>Spa / Wellness</option>
             <option>Other</option>
           </select>
+          <div class="interests-box">
+            <div class="interests-label">I'm interested in (check all that apply)</div>
+            <div class="interests-checks">
+              <label class="int-item"><input type="checkbox" id="m-int-page"> Full Business Page</label>
+              <label class="int-item"><input type="checkbox" id="m-int-booking"> Booking Platform</label>
+              <label class="int-item"><input type="checkbox" id="m-int-sdata"> Structured Data</label>
+              <label class="int-item"><input type="checkbox" id="m-int-auto"> Automations</label>
+              <label class="int-item"><input type="checkbox" id="m-int-qr"> QR Menu</label>
+            </div>
+          </div>
           <div class="consent-box">
             <label class="consent-label">
               <input id="m-consent" class="consent-cb" type="checkbox" />
@@ -1215,6 +1240,13 @@
       document.getElementById(formId).style.display = 'none';
       document.getElementById(successId).style.display = 'block';
     }
+    function getInterests(prefix) {
+      var map = { page: 'Full Business Page', booking: 'Booking Platform', sdata: 'Structured Data', auto: 'Automations', qr: 'QR Menu' };
+      return Object.keys(map).filter(function(k) {
+        var el = document.getElementById(prefix + '-int-' + k);
+        return el && el.checked;
+      }).map(function(k){ return map[k]; });
+    }
     function modalSubmit() {
       var biz     = document.getElementById('m-biz').value.trim();
       var name    = document.getElementById('m-name').value.trim();
@@ -1232,6 +1264,7 @@
           business: biz, name: name, phone: phone,
           email: document.getElementById('m-email').value.trim(),
           business_type: document.getElementById('m-type').value,
+          interests: getInterests('m'),
           sms_consent: true
         })
       }).catch(function(){}).finally(function(){ showSuccess('m-form','m-success'); });
@@ -1241,7 +1274,7 @@
       if (!consent) { alert('Please agree to receive SMS messages to continue.'); return; }
       var btn = document.getElementById('inline-submit');
       btn.textContent = 'Submitting…'; btn.disabled = true;
-      var inputs = document.querySelectorAll('.cta-section .form-input, .cta-section .form-select');
+      var inputs = document.querySelectorAll('.cta-section .form-input');
       fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1251,7 +1284,8 @@
           name:     inputs[1] ? inputs[1].value.trim() : '',
           phone:    inputs[2] ? inputs[2].value.trim() : '',
           email:    inputs[3] ? inputs[3].value.trim() : '',
-          business_type: inputs[4] ? inputs[4].value : '',
+          business_type: document.getElementById('inline-type').value,
+          interests: getInterests('il'),
           sms_consent: true
         })
       }).catch(function(){}).finally(function(){
