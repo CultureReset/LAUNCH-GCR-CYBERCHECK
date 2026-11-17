@@ -2,7 +2,8 @@
 const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = 'https://mhafixflyffflwjhcgfn.supabase.co';
-const SUPABASE_SECRET = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_KEY;
+// Same profiles "websites" publishable key used in index.html. Publishable keys are meant for client use.
+const SUPABASE_PUBLISHABLE = process.env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_8AGgfn1H4jieakGWIe2UcQ_JrAeaUKB';
 
 const CYBERCHECK_API = process.env.CYBERCHECK_API_URL || 'https://cybercheck-api-database.vercel.app';
 
@@ -12,11 +13,6 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  if (!SUPABASE_SECRET) {
-    console.error('Missing SUPABASE_SECRET_KEY or SUPABASE_SERVICE_KEY');
-    return res.status(500).json({ error: 'Server is not configured' });
-  }
 
   try {
     const {
@@ -46,13 +42,11 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'phone or email required' });
     }
 
-    // Save to Supabase
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET);
-    const { data, error } = await supabase
+    // Insert only; Prefer: return=minimal. Do not request the row back.
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE);
+    const { error } = await supabase
       .from('sales_leads')
-      .insert(lead)
-      .select()
-      .single();
+      .insert(lead);
 
     if (error) console.error('Supabase insert error:', error);
 
@@ -71,7 +65,7 @@ module.exports = async function handler(req, res) {
       }),
     }).catch(e => console.error('lead-notify call failed:', e.message));
 
-    return res.status(200).json({ ok: true, id: data?.id });
+    return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Contact handler error:', err);
     return res.status(200).json({ ok: true });
