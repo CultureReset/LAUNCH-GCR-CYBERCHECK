@@ -1,9 +1,8 @@
 // /api/contact — saves GCR sales lead to Supabase, then calls cybercheck-api to send SMS + email
 const { createClient } = require('@supabase/supabase-js');
 
-const SUPABASE_URL     = 'https://mhafixflyffflwjhcgfn.supabase.co';
-const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY;
-const SUPABASE_ANON    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oYWZpeGZseWZmZmx3amhjZ2ZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MTA4MzUsImV4cCI6MjA4NzM4NjgzNX0.3KW-rGnLhJQ1u3IsSeoGFfgQpcoJNdBGFOGnhc88tHw';
+const SUPABASE_URL = 'https://mhafixflyffflwjhcgfn.supabase.co';
+const SUPABASE_SECRET = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_KEY;
 
 const CYBERCHECK_API = process.env.CYBERCHECK_API_URL || 'https://cybercheck-api-database.vercel.app';
 
@@ -13,6 +12,11 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  if (!SUPABASE_SECRET) {
+    console.error('Missing SUPABASE_SECRET_KEY or SUPABASE_SERVICE_KEY');
+    return res.status(500).json({ error: 'Server is not configured' });
+  }
 
   try {
     const {
@@ -43,7 +47,7 @@ module.exports = async function handler(req, res) {
     }
 
     // Save to Supabase
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE || SUPABASE_ANON);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET);
     const { data, error } = await supabase
       .from('sales_leads')
       .insert(lead)
