@@ -1,9 +1,9 @@
 // /api/contact — saves GCR sales lead to Supabase, then calls cybercheck-api to send SMS + email
 const { createClient } = require('@supabase/supabase-js');
 
-const SUPABASE_URL     = 'https://mhafixflyffflwjhcgfn.supabase.co';
-const SUPABASE_SERVICE = process.env.SUPABASE_SERVICE_KEY;
-const SUPABASE_ANON    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oYWZpeGZseWZmZmx3amhjZ2ZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4MTA4MzUsImV4cCI6MjA4NzM4NjgzNX0.3KW-rGnLhJQ1u3IsSeoGFfgQpcoJNdBGFOGnhc88tHw';
+const SUPABASE_URL = 'https://mhafixflyffflwjhcgfn.supabase.co';
+// Same profiles "websites" publishable key used in index.html. Publishable keys are meant for client use.
+const SUPABASE_PUBLISHABLE = process.env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_8AGgfn1H4jieakGWIe2UcQ_JrAeaUKB';
 
 const CYBERCHECK_API = process.env.CYBERCHECK_API_URL || 'https://cybercheck-api-database.vercel.app';
 
@@ -42,13 +42,11 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'phone or email required' });
     }
 
-    // Save to Supabase
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE || SUPABASE_ANON);
-    const { data, error } = await supabase
+    // Insert only; Prefer: return=minimal. Do not request the row back.
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE);
+    const { error } = await supabase
       .from('sales_leads')
-      .insert(lead)
-      .select()
-      .single();
+      .insert(lead);
 
     if (error) console.error('Supabase insert error:', error);
 
@@ -67,7 +65,7 @@ module.exports = async function handler(req, res) {
       }),
     }).catch(e => console.error('lead-notify call failed:', e.message));
 
-    return res.status(200).json({ ok: true, id: data?.id });
+    return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Contact handler error:', err);
     return res.status(200).json({ ok: true });
